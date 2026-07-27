@@ -216,10 +216,11 @@ def main():
         st.markdown(term_html, unsafe_allow_html=True)
         
         # THE FIX: Use st.chat_input instead of st.text_input, and DO NOT use st.rerun()
+                # Command Input at the bottom of the right column
         if user_cmd := st.chat_input("Enter command:", key="term_input"):
             if user_cmd.strip():
                 out = run_bash_command(user_cmd)
-                st.session_state.term_history.append({"cmd": user_cmd, "out": out"})
+                st.session_state.term_history.append({"cmd": user_cmd, "out": out})
                 # st.rerun() is REMOVED here. chat_input natively clears and reruns the app safely!
 
 if __name__ == "__main__":
