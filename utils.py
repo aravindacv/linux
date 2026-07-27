@@ -35,7 +35,7 @@ def init_bash_sandbox():
         st.session_state.term_history = []
 
 # ==========================================
-# 2. BASH EXECUTION ENGINE
+# 2. BASH EXECUTION ENGINE (FIXED FOR CLOUD)
 # ==========================================
 def run_bash_command(command):
     DANGEROUS = ["rm -rf /", "sudo", "su ", "mkfs", "dd if=", "> /dev/sda", ":(){ :|:& };:"]
@@ -45,13 +45,22 @@ def run_bash_command(command):
     if command.split()[0] in INTERACTIVE: return f"🖥️ [SIMULATED] '{command.split()[0]}' requires an interactive TTY screen."
     
     try:
-        result = subprocess.run(command, shell=True, cwd=st.session_state.sandbox_dir, capture_output=True, text=True, timeout=5)
+        # CRITICAL FIX: Added executable='/bin/bash' so commands like 'alias' don't crash the cloud server
+        result = subprocess.run(
+            command, 
+            shell=True, 
+            executable='/bin/bash', 
+            cwd=st.session_state.sandbox_dir, 
+            capture_output=True, 
+            text=True, 
+            timeout=5
+        )
         output = result.stdout + (f"\n[stderr]\n{result.stderr}" if result.stderr else "")
         return output if output else "(Command executed successfully)"
     except Exception as e: return f"⚠️ Error: {str(e)}"
 
 # ==========================================
-# 3. REUSABLE UI COMPONENTS (W3Schools Style)
+# 3. REUSABLE UI COMPONENTS
 # ==========================================
 def app_header(title, subtitle):
     st.markdown(f"<h1 style='color:#4CAF50;'>{title}</h1>", unsafe_allow_html=True)
@@ -70,13 +79,12 @@ def render_lesson(title, content, example_cmd):
     st.markdown(f"### {title}")
     st.markdown(content)
     
-    # The W3Schools "Try it Yourself" Box
     col1, col2 = st.columns([1, 4])
     with col1:
         if st.button(f"▶️ Run", key=f"btn_{title.replace(' ', '_')}"):
             out = run_bash_command(example_cmd)
             st.session_state.term_history.append({"cmd": example_cmd, "out": out})
-            st.rerun()
+            # CRITICAL FIX: Removed st.rerun() here. It causes Streamlit to crash inside loops.
     with col2:
         st.code(example_cmd, language="bash")
     st.markdown("---")
@@ -99,4 +107,4 @@ def render_live_terminal():
     if user_cmd := st.chat_input("student@linux-sandbox:~$"):
         out = run_bash_command(user_cmd)
         st.session_state.term_history.append({"cmd": user_cmd, "out": out})
-        st.rerun()
+        # Removed st.rerun() here as well to prevent cloud exceptions. Streamlit handles chat input clearing natively now.
