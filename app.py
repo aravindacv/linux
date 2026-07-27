@@ -2,6 +2,8 @@ import streamlit as st
 from utils import app_header, init_bash_sandbox, progress_sidebar, load_css
 
 st.set_page_config(page_title="Bash Tutorial — Live Tutor", layout="wide", page_icon="💻")
+st.set_option('client.showErrorDetails', True) 
+
 load_css()
 init_bash_sandbox()
 
@@ -19,3 +21,7 @@ st.markdown("""
 progress_sidebar()
 st.markdown("---")
 st.markdown("**Start with `1️⃣ Bash Intro` from the left sidebar → Pages. Enjoy learning!**")
+
+
+
+
