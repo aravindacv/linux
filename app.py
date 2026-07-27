@@ -194,7 +194,7 @@ def main():
         else:
             st.info("👈 Select a specific lesson from the dropdown above to view its theory and run examples.")
 
-    # ==========================================
+       # ==========================================
     # RIGHT COLUMN: PERSISTENT TERMINAL
     # ==========================================
     with right_col:
@@ -215,12 +215,12 @@ def main():
         
         st.markdown(term_html, unsafe_allow_html=True)
         
-        # Command Input at the bottom of the right column
-        if user_cmd := st.text_input("Enter command:", key="term_input"):
+        # THE FIX: Use st.chat_input instead of st.text_input, and DO NOT use st.rerun()
+        if user_cmd := st.chat_input("Enter command:", key="term_input"):
             if user_cmd.strip():
                 out = run_bash_command(user_cmd)
-                st.session_state.term_history.append({"cmd": user_cmd, "out": out})
-                st.rerun()
+                st.session_state.term_history.append({"cmd": user_cmd, "out": out"})
+                # st.rerun() is REMOVED here. chat_input natively clears and reruns the app safely!
 
 if __name__ == "__main__":
     main()
