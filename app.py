@@ -88,9 +88,21 @@ CLAY_CSS = """
         height: 350px; overflow-y: auto; border: none;
         box-shadow: inset 6px 6px 12px #1e2325, inset -6px -6px 12px #3c4547;
     }
-    .term-box span, .term-box div { color: inherit !important; }
-    .term-cmd { color: #00cec9 !important; margin-bottom: 4px; white-space: pre-wrap; font-weight: bold;}
-    .term-out { color: #dfe6e9 !important; white-space: pre-wrap; margin-bottom: 15px; border-bottom: 1px solid #636e72; padding-bottom: 10px;}
+    /* High-specificity, unambiguous colors for terminal lines — these must
+       never fall back to inherit/currentColor, since that previously
+       resolved to the same dark shade as the terminal's own background,
+       making the text invisible except when highlighted by mouse selection. */
+    .term-box .term-cmd, .term-box .term-cmd * {
+        color: #00cec9 !important; margin-bottom: 4px; white-space: pre-wrap; font-weight: bold;
+    }
+    .term-box .term-out, .term-box .term-out * {
+        color: #dfe6e9 !important; white-space: pre-wrap; margin-bottom: 15px; border-bottom: 1px solid #636e72; padding-bottom: 10px;
+    }
+    .term-box > span { color: #b2bec3 !important; }
+
+    /* Make the mouse-selection highlight readable too, instead of relying
+       on the browser default */
+    .term-box ::selection { background: #4a5658; color: #ffffff; }
 
     /* Buttons Override */
     .stButton > button, .stButton > button p, .stButton > button div, .stButton > button span {
