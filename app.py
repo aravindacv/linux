@@ -1,5 +1,5 @@
 # =========================
-# Bash Tutorial — Claymorphism UI + Full Data
+# Bash Tutorial — Claymorphism UI + Full Data (Text Visibility Fixed)
 # =========================
 import subprocess
 import os
@@ -9,30 +9,50 @@ from typing import List, Dict, Any
 import streamlit as st
 
 # -------------------------------------------------------
-# CLAYMORPHISM CSS
+# CLAYMORPHISM CSS (Fixed Text Visibility)
 # -------------------------------------------------------
 st.set_page_config(page_title="Bash Tutorial • Clay UI", page_icon="🪵", layout="wide")
 
 CLAY_CSS = """
 <style>
+    /* Global Background */
     .stApp { background-color: #e0e5ec !important; }
-    h1, h2, h3, p, span { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2d3436; }
+    
+    /* FORCE DARK TEXT EVERYWHERE TO PREVENT INVISIBLE TEXT BUG */
+    h1, h2, h3, h4, h5, h6, p, span, li, div { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        color: #2d3436 !important; 
+    }
     h1, h2, h3 { font-weight: 800; text-shadow: 2px 2px 4px rgba(163,177,198,0.6); }
 
+    /* Clay Card Base */
     .card { 
         border: none; border-radius: 20px; padding: 22px 25px; background: #e0e5ec; margin: 15px 0; 
         box-shadow: 9px 9px 16px #b8bec7, -9px -9px 16px #ffffff; transition: all 0.2s ease; line-height: 1.7;
     }
-    .card .title { font-weight: 800; margin-bottom: 10px; font-size: 1.15rem; }
+    
+    /* SPECIFIC FIX FOR INVISIBLE TITLE & TEXT INSIDE CARDS */
+    .card .title { 
+        font-weight: 800 !important; margin-bottom: 10px; font-size: 1.2rem; 
+        color: #000000 !important; /* Force Black for titles */
+    }
+    .card p, .card div, .card span {
+        color: #333333 !important; /* Force Dark Grey for body text */
+    }
 
+    /* Clay Card Variants */
     .card.note  { border-left: 6px solid #74b9ff; box-shadow: 9px 9px 16px #b8bec7, -9px -9px 16px #ffffff, inset 3px 0 0px #a4d0ff; }
     .card.tip   { border-left: 6px solid #55efc4; box-shadow: 9px 9px 16px #b8bec7, -9px -9px 16px #ffffff, inset 3px 0 0px #81ffdb; }
     .card.warn  { border-left: 6px solid #ffeaa7; box-shadow: 9px 9px 16px #b8bec7, -9px -9px 16px #ffffff, inset 3px 0 0px #fff3b0; }
     
+    /* Terminal Container */
     .term-container {
         background: #e0e5ec; border-radius: 25px; padding: 15px;
         box-shadow: 12px 12px 24px #b8bec7, -12px -12px 24px #ffffff; margin-top: 20px;
     }
+    .term-container h3 { color: #000000 !important; } /* Terminal Title Fix */
+    
+    /* Terminal Inner Screen */
     .term-box {
         background-color: #2d3436; color: #dfe6e9; border-radius: 15px; padding: 20px; 
         font-family: 'Fira Code', 'Consolas', monospace; font-size: 14px;
@@ -42,6 +62,7 @@ CLAY_CSS = """
     .term-cmd { color: #00cec9; margin-bottom: 4px; white-space: pre-wrap; font-weight: bold;}
     .term-out { color: #dfe6e9; white-space: pre-wrap; margin-bottom: 15px; border-bottom: 1px solid #636e72; padding-bottom: 10px;}
 
+    /* Buttons Override */
     .stButton > button {
         background: #e0e5ec !important; color: #2d3436 !important; border: none !important;
         border-radius: 12px !important; box-shadow: 6px 6px 12px #b8bec7, -6px -6px 12px #ffffff !important;
@@ -49,9 +70,16 @@ CLAY_CSS = """
     }
     .stButton > button:active { box-shadow: inset 4px 4px 8px #b8bec7, inset -4px -4px 8px #ffffff !important; }
     
+    /* Code Blocks */
     [data-testid="stCode"] {
         background-color: #e0e5ec; border: none; border-radius: 12px;
-        box-shadow: inset 4px 4px 8px #b8bec7, inset -4px -4px 8px #ffffff; color: #2d3436; font-weight: 600;
+        box-shadow: inset 4px 4px 8px #b8bec7, inset -4px -4px 8px #ffffff; color: #2d3436 !important; font-weight: 600;
+    }
+    
+    /* Selectbox & Inputs */
+    [data-testid="stSelectbox"] label, [data-testid="stCheckbox"] label {
+        color: #2d3436 !important;
+        font-weight: 600 !important;
     }
 </style>
 """
@@ -61,7 +89,9 @@ st.markdown(CLAY_CSS, unsafe_allow_html=True)
 # UI Helpers
 # -------------------------------------------------------
 def card(kind: str, title: str, body: str):
-    st.markdown(f'<div class="card {kind}"><div class="title">{title}</div><div>{body}</div></div>', unsafe_allow_html=True)
+    # Ensure body text maintains line breaks
+    formatted_body = body.replace('\n', '<br>')
+    st.markdown(f'<div class="card {kind}"><div class="title">{title}</div><div>{formatted_body}</div></div>', unsafe_allow_html=True)
 
 def render_mcq(questions: List[Dict[str, Any]], key_prefix: str):
     for i, q in enumerate(questions):
@@ -95,7 +125,7 @@ def run_bash_command(command):
     except Exception as e: return f"⚠️ Error: {str(e)}"
 
 # -------------------------------------------------------
-# COMPLETE DATABASE (Using Triple Quotes to fix bugs)
+# COMPLETE DATABASE (Using Triple Quotes)
 # -------------------------------------------------------
 @dataclass
 class Lesson:
